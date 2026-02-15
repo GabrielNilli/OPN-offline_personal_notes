@@ -43,15 +43,15 @@ class _HomePageState extends State<HomePage> {
           children: [
             // Icona Home
             _buildNavItem(Icons.home_outlined, "Home", true),
-            // Icona Note
-            _buildNavItem(Icons.description_outlined, "Note", false),
+            // Icona Notes
+            _buildNavItem(Icons.description_outlined, "Notes", false),
 
             // Spazio vuoto centrale per il FAB
             const SizedBox(width: 40),
 
-            // Icona Dati
-            _buildNavItem(Icons.bar_chart_outlined, "Dati", false),
-            // Icona Set
+            // Icona Charts
+            _buildNavItem(Icons.bar_chart_outlined, "Charts", false),
+            // Icona Settings
             _buildNavItem(Icons.settings_outlined, "Settings", false),
           ],
         ),

@@ -1,16 +1,10 @@
 # offline_personal_notes
 
-A new Flutter project.
+My personal offline App about taking notes and saving datas in chart.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## TODO
+- Create File for widgets and methods to export for better code and formatting.
+- Create basic pages (Order: Settings, Basic Layout for Home, Basic Layout for Notes, Basic Layout for Chart, Basic Layout for Add-page).
+- Create Navigation.
+- Create Login.
+- Create Themes.
