@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class NotesPage extends StatefulWidget {
-  const NotesPage({super.key});
+class DataPage extends StatefulWidget {
+  const DataPage({super.key});
 
   @override
-  State<NotesPage> createState() => _NotesPageState();
+  State<DataPage> createState() => _DataPageState();
 }
 
-class _NotesPageState extends State<NotesPage> {
+class _DataPageState extends State<DataPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,13 +16,13 @@ class _NotesPageState extends State<NotesPage> {
         backgroundColor: const Color(0xFF0D1117),
         elevation: 0,
         title: const Text(
-          "Note",
+          "Dati",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
       body: const Center(
         child: Text(
-          "Pagina Note",
+          "Pagina Dati",
           style: TextStyle(color: Colors.white, fontSize: 18),
         ),
       ),
