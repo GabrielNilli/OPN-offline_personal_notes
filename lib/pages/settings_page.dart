@@ -106,15 +106,6 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildCard(context, [
             _buildToggleTile(
               context,
-              icon: Icons.notifications_outlined,
-              iconColor: Colors.redAccent,
-              title: 'Abilita Promemoria',
-              value: _notificheAttive,
-              onChanged: (v) => setState(() => _notificheAttive = v),
-            ),
-            _buildDivider(context),
-            _buildToggleTile(
-              context,
               icon: Icons.volume_up_outlined,
               iconColor: Colors.redAccent,
               title: 'Suoni e Vibrazione',
@@ -135,7 +126,7 @@ class _SettingsPageState extends State<SettingsPage> {
             _buildArrowTile(
               context,
               icon: Icons.cloud_upload_outlined,
-              iconColor: Colors.green,
+              iconColor: Colors.cyan,
               title: 'Backup e Ripristino',
               onTap: () {},
             ),
@@ -151,39 +142,11 @@ class _SettingsPageState extends State<SettingsPage> {
             _buildArrowTile(
               context,
               icon: Icons.lock_outline,
-              iconColor: Colors.green,
+              iconColor: Colors.purple,
               title: 'Privacy e Sicurezza',
               onTap: () {},
             ),
           ]),
-          const SizedBox(height: 24),
-
-          _buildSectionLabel('INFO'),
-          const SizedBox(height: 8),
-          _buildCard(context, [
-            _buildArrowTile(
-              context,
-              icon: Icons.description_outlined,
-              iconColor: Colors.grey,
-              title: 'Termini di Servizio',
-              onTap: () {},
-            ),
-            _buildDivider(context),
-            _buildArrowTile(
-              context,
-              icon: Icons.info_outline,
-              iconColor: Colors.grey,
-              title: 'Licenze Open Source',
-              onTap: () {},
-            ),
-          ]),
-          const SizedBox(height: 12),
-          Center(
-            child: Text(
-              'Versione 1.0.0 (build 1)',
-              style: TextStyle(color: Colors.grey[600], fontSize: 12),
-            ),
-          ),
           const SizedBox(height: 24),
 
           SizedBox(
@@ -292,7 +255,7 @@ class _SettingsPageState extends State<SettingsPage> {
         children: [
           Row(
             children: [
-              _buildIconBox(Icons.palette_outlined, Colors.blueAccent),
+              _buildIconBox(Icons.palette_outlined, Colors.orange),
               const SizedBox(width: 12),
               Text('Tema', style: TextStyle(color: textColor, fontSize: 15)),
             ],
