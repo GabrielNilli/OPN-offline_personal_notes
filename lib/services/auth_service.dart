@@ -8,16 +8,15 @@ class AuthService {
   static const _keyPasswordHash = 'auth_password_hash';
   static const _keyPin = 'auth_pin';
   static const _keyIsRegistered = 'auth_is_registered';
+  static const _keyProfileImagePath = 'auth_profile_image_path';
 
   final LocalAuthentication _localAuth = LocalAuthentication();
 
-  // Restituisce true se l'utente ha già un account sul dispositivo
   Future<bool> isRegistered() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_keyIsRegistered) ?? false;
   }
 
-  // Registra un nuovo utente (primo avvio)
   Future<void> register(String username, String password) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyUsername, username);
@@ -25,13 +24,11 @@ class AuthService {
     await prefs.setBool(_keyIsRegistered, true);
   }
 
-  // Salva il PIN scelto dall'utente
   Future<void> savePin(String pin) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyPin, _hashPassword(pin));
   }
 
-  // Verifica username + password
   Future<bool> loginWithPassword(String username, String password) async {
     final prefs = await SharedPreferences.getInstance();
     final savedUsername = prefs.getString(_keyUsername);
@@ -39,21 +36,18 @@ class AuthService {
     return savedUsername == username && savedHash == _hashPassword(password);
   }
 
-  // Verifica il PIN
   Future<bool> loginWithPin(String pin) async {
     final prefs = await SharedPreferences.getInstance();
     final savedHash = prefs.getString(_keyPin);
     return savedHash == _hashPassword(pin);
   }
 
-  // Controlla se il dispositivo supporta il biometrico
   Future<bool> isBiometricAvailable() async {
     final isAvailable = await _localAuth.canCheckBiometrics;
     final isDeviceSupported = await _localAuth.isDeviceSupported();
     return isAvailable && isDeviceSupported;
   }
 
-  // Avvia l'autenticazione biometrica
   Future<bool> loginWithBiometric() async {
     try {
       return await _localAuth.authenticate(
@@ -68,16 +62,63 @@ class AuthService {
     }
   }
 
-  // Recupera lo username salvato
   Future<String> getSavedUsername() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_keyUsername) ?? '';
   }
 
-  // Cancella tutti i dati (logout)
-  Future<void> logout() async {}
+  // ── Foto profilo ─────────────────────────────────────────────────
 
-  // Hash SHA-256 della stringa
+  Future<void> saveProfileImagePath(String path) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyProfileImagePath, path);
+  }
+
+  Future<String?> getProfileImagePath() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyProfileImagePath);
+  }
+
+  // ── Modifica credenziali ─────────────────────────────────────────
+
+  // Aggiorna username (richiede la password attuale per conferma)
+  Future<bool> updateUsername(
+    String newUsername,
+    String currentPassword,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedHash = prefs.getString(_keyPasswordHash);
+    if (savedHash != _hashPassword(currentPassword)) return false;
+    await prefs.setString(_keyUsername, newUsername);
+    return true;
+  }
+
+  // Aggiorna password (richiede la password attuale)
+  Future<bool> updatePassword(
+    String currentPassword,
+    String newPassword,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedHash = prefs.getString(_keyPasswordHash);
+    if (savedHash != _hashPassword(currentPassword)) return false;
+    await prefs.setString(_keyPasswordHash, _hashPassword(newPassword));
+    return true;
+  }
+
+  // Aggiorna PIN (non richiede conferma, già autenticati)
+  Future<void> updatePin(String newPin) async {
+    await savePin(newPin);
+  }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_keyUsername);
+    await prefs.remove(_keyPasswordHash);
+    await prefs.remove(_keyPin);
+    await prefs.remove(_keyIsRegistered);
+    await prefs.remove(_keyProfileImagePath);
+  }
+
   String _hashPassword(String input) {
     final bytes = utf8.encode(input);
     return sha256.convert(bytes).toString();

@@ -31,7 +31,6 @@ class _PinLoginPageState extends State<PinLoginPage> {
       _username = username;
       _biometricAvailable = biometric;
     });
-    // Proponi subito il biometrico all'apertura
     if (biometric) _tryBiometric();
   }
 
@@ -83,20 +82,28 @@ class _PinLoginPageState extends State<PinLoginPage> {
     );
   }
 
+  void _changeAccount() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginPage(forceRegister: true)),
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final textColor = Theme.of(context).colorScheme.onSurface;
+    final cardColor = Theme.of(context).cardColor;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1117),
       body: SafeArea(
         child: Column(
           children: [
             const SizedBox(height: 60),
-
-            // Avatar / Icona utente
-            const CircleAvatar(
+            CircleAvatar(
               radius: 36,
-              backgroundColor: Color(0xFF161B22),
-              child: Icon(
+              backgroundColor: cardColor,
+              child: const Icon(
                 Icons.person_outline,
                 color: Colors.blueAccent,
                 size: 40,
@@ -105,8 +112,8 @@ class _PinLoginPageState extends State<PinLoginPage> {
             const SizedBox(height: 16),
             Text(
               'Bentornato, $_username',
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: textColor,
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
@@ -117,8 +124,6 @@ class _PinLoginPageState extends State<PinLoginPage> {
               style: TextStyle(color: Colors.grey[400], fontSize: 14),
             ),
             const SizedBox(height: 48),
-
-            // Pallini PIN
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(4, (i) {
@@ -138,7 +143,6 @@ class _PinLoginPageState extends State<PinLoginPage> {
                 );
               }),
             ),
-
             if (_errorMessage != null) ...[
               const SizedBox(height: 16),
               Text(
@@ -146,14 +150,9 @@ class _PinLoginPageState extends State<PinLoginPage> {
                 style: const TextStyle(color: Colors.redAccent, fontSize: 13),
               ),
             ],
-
             const Spacer(),
-
-            // Tastierino numerico
-            _buildKeypad(),
+            _buildKeypad(context),
             const SizedBox(height: 16),
-
-            // Accesso biometrico
             if (_biometricAvailable)
               TextButton.icon(
                 onPressed: _tryBiometric,
@@ -167,13 +166,23 @@ class _PinLoginPageState extends State<PinLoginPage> {
                   style: TextStyle(color: Colors.blueAccent),
                 ),
               ),
-
-            // Recupero con password
             TextButton(
               onPressed: _goToPasswordRecovery,
               child: Text(
                 'Ho dimenticato il PIN',
                 style: TextStyle(color: Colors.grey[500], fontSize: 13),
+              ),
+            ),
+            TextButton.icon(
+              onPressed: _changeAccount,
+              icon: const Icon(
+                Icons.switch_account_outlined,
+                color: Colors.blueAccent,
+                size: 18,
+              ),
+              label: const Text(
+                'Cambia account',
+                style: TextStyle(color: Colors.blueAccent, fontSize: 13),
               ),
             ),
             const SizedBox(height: 16),
@@ -183,7 +192,8 @@ class _PinLoginPageState extends State<PinLoginPage> {
     );
   }
 
-  Widget _buildKeypad() {
+  Widget _buildKeypad(BuildContext context) {
+    final textColor = Theme.of(context).colorScheme.onSurface;
     const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 48),
@@ -208,8 +218,8 @@ class _PinLoginPageState extends State<PinLoginPage> {
             onPressed: () => _onKeyPress(key),
             child: Text(
               key,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: textColor,
                 fontSize: 26,
                 fontWeight: FontWeight.w400,
               ),

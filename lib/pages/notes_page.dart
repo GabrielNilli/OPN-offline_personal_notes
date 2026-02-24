@@ -10,20 +10,14 @@ class NotesPage extends StatefulWidget {
 class _NotesPageState extends State<NotesPage> {
   @override
   Widget build(BuildContext context) {
+    final textColor = Theme.of(context).colorScheme.onSurface;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1117),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0D1117),
-        elevation: 0,
-        title: const Text(
-          "Note",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: const Center(
+      appBar: AppBar(title: const Text("Note")),
+      body: Center(
         child: Text(
           "Pagina Note",
-          style: TextStyle(color: Colors.white, fontSize: 18),
+          style: TextStyle(color: textColor, fontSize: 18),
         ),
       ),
     );

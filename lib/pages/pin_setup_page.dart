@@ -25,8 +25,9 @@ class _PinSetupPageState extends State<PinSetupPage> {
         if (_pin.length == 4) _isConfirming = true;
       } else {
         if (_confirmPin.length < 4) _confirmPin += value;
-        if (_confirmPin.length == 4)
+        if (_confirmPin.length == 4) {
           _confirmPin == _pin ? _savePin() : _pinMismatch();
+        }
       }
     });
   }
@@ -35,13 +36,10 @@ class _PinSetupPageState extends State<PinSetupPage> {
     setState(() {
       _errorMessage = null;
       if (_isConfirming) {
-        if (_confirmPin.isNotEmpty) {
+        if (_confirmPin.isNotEmpty)
           _confirmPin = _confirmPin.substring(0, _confirmPin.length - 1);
-        }
       } else {
-        if (_pin.isNotEmpty) {
-          _pin = _pin.substring(0, _pin.length - 1);
-        }
+        if (_pin.isNotEmpty) _pin = _pin.substring(0, _pin.length - 1);
       }
     });
   }
@@ -65,6 +63,7 @@ class _PinSetupPageState extends State<PinSetupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final textColor = Theme.of(context).colorScheme.onSurface;
     final currentPin = _isConfirming ? _confirmPin : _pin;
     final title = _isConfirming ? 'Conferma il PIN' : 'Scegli un PIN';
     final subtitle = _isConfirming
@@ -72,15 +71,14 @@ class _PinSetupPageState extends State<PinSetupPage> {
         : 'Scegli 4 cifre da usare per accedere';
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1117),
       body: SafeArea(
         child: Column(
           children: [
             const SizedBox(height: 60),
             Text(
               title,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: textColor,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
@@ -92,8 +90,6 @@ class _PinSetupPageState extends State<PinSetupPage> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 48),
-
-            // Pallini PIN
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(4, (i) {
@@ -113,7 +109,6 @@ class _PinSetupPageState extends State<PinSetupPage> {
                 );
               }),
             ),
-
             if (_errorMessage != null) ...[
               const SizedBox(height: 16),
               Text(
@@ -121,11 +116,8 @@ class _PinSetupPageState extends State<PinSetupPage> {
                 style: const TextStyle(color: Colors.redAccent, fontSize: 13),
               ),
             ],
-
             const Spacer(),
-
-            // Tastierino numerico
-            _buildKeypad(),
+            _buildKeypad(context),
             const SizedBox(height: 32),
           ],
         ),
@@ -133,7 +125,8 @@ class _PinSetupPageState extends State<PinSetupPage> {
     );
   }
 
-  Widget _buildKeypad() {
+  Widget _buildKeypad(BuildContext context) {
+    final textColor = Theme.of(context).colorScheme.onSurface;
     const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 48),
@@ -158,8 +151,8 @@ class _PinSetupPageState extends State<PinSetupPage> {
             onPressed: () => _onKeyPress(key),
             child: Text(
               key,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: textColor,
                 fontSize: 26,
                 fontWeight: FontWeight.w400,
               ),

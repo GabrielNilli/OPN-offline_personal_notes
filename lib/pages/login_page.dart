@@ -3,7 +3,8 @@ import '../services/auth_service.dart';
 import 'pin_setup_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final bool forceRegister;
+  const LoginPage({super.key, this.forceRegister = false});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -17,8 +18,6 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   bool _obscurePassword = true;
   String? _errorMessage;
-
-  // true = primo avvio (registrazione), false = login classico di recupero
   bool _isRegisterMode = true;
 
   @override
@@ -28,6 +27,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _checkMode() async {
+    if (widget.forceRegister) {
+      setState(() => _isRegisterMode = true);
+      return;
+    }
     final registered = await _authService.isRegistered();
     setState(() => _isRegisterMode = !registered);
   }
@@ -53,7 +56,6 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     if (_isRegisterMode) {
-      // Primo avvio: registra e vai alla creazione del PIN
       await _authService.register(username, password);
       if (mounted) {
         Navigator.pushReplacement(
@@ -62,7 +64,6 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } else {
-      // Login di recupero (dopo aver dimenticato il PIN)
       final success = await _authService.loginWithPassword(username, password);
       if (success) {
         if (mounted) {
@@ -81,8 +82,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final textColor = Theme.of(context).colorScheme.onSurface;
+    final cardColor = Theme.of(context).cardColor;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0D1117),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -94,8 +97,8 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 40),
                 Text(
                   _isRegisterMode ? 'Crea account' : 'Accedi',
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: textColor,
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                   ),
@@ -108,17 +111,15 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(color: Colors.grey[400], fontSize: 15),
                 ),
                 const SizedBox(height: 40),
-
-                // Campo username
                 _buildTextField(
+                  context: context,
                   controller: _usernameController,
                   label: 'Username',
                   icon: Icons.person_outline,
                 ),
                 const SizedBox(height: 16),
-
-                // Campo password
                 _buildTextField(
+                  context: context,
                   controller: _passwordController,
                   label: 'Password',
                   icon: Icons.lock_outline,
@@ -134,8 +135,6 @@ class _LoginPageState extends State<LoginPage> {
                         setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
-
-                // Errore
                 if (_errorMessage != null) ...[
                   const SizedBox(height: 12),
                   Text(
@@ -146,10 +145,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ],
-
                 const SizedBox(height: 32),
-
-                // Bottone principale
                 SizedBox(
                   width: double.infinity,
                   height: 52,
@@ -173,6 +169,29 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                   ),
                 ),
+                const SizedBox(height: 16),
+                if (!_isRegisterMode || widget.forceRegister)
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const LoginPage(forceRegister: true),
+                          ),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.switch_account_outlined,
+                        color: Colors.blueAccent,
+                      ),
+                      label: const Text(
+                        'Crea un nuovo account',
+                        style: TextStyle(color: Colors.blueAccent),
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: 40),
               ],
             ),
@@ -183,23 +202,27 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildTextField({
+    required BuildContext context,
     required TextEditingController controller,
     required String label,
     required IconData icon,
     bool obscure = false,
     Widget? suffixIcon,
   }) {
+    final textColor = Theme.of(context).colorScheme.onSurface;
+    final cardColor = Theme.of(context).cardColor;
+
     return TextField(
       controller: controller,
       obscureText: obscure,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: textColor),
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(color: Colors.grey[400]),
         prefixIcon: Icon(icon, color: Colors.grey),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: const Color(0xFF161B22),
+        fillColor: cardColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
