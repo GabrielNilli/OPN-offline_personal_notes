@@ -9,3 +9,4 @@ My personal offline App about taking notes and saving datas in chart.
 - Create Navigation. ✅
 - Create Login. ✅
 - Create Themes. ✅
+- If in note page ask if you want to create a list or a note.
