@@ -1,10 +1,57 @@
 import { useState, useEffect } from "react";
 
-type Status = "loading" | "ready" | "no-permission" | "unsupported";
+import type { Status } from "../types";
 
 const DB_NAME = "noteflow-fs";
 const STORE = "handles";
 const HANDLE_KEY = "root-dir";
+
+async function getOrCreateSubdir(
+  root: FileSystemDirectoryHandle,
+  name: string,
+) {
+  return root.getDirectoryHandle(name, { create: true });
+}
+
+async function writeFile(
+  dir: FileSystemDirectoryHandle,
+  filename: string,
+  content: string,
+) {
+  const fileHandle = await dir.getFileHandle(filename, { create: true });
+  const writable = await fileHandle.createWritable();
+  await writable.write(content);
+  await writable.close();
+}
+
+async function readFile(
+  dir: FileSystemDirectoryHandle,
+  filename: string,
+): Promise<string | null> {
+  try {
+    const fileHandle = await dir.getFileHandle(filename);
+    const file = await fileHandle.getFile();
+    return file.text();
+  } catch {
+    return null;
+  }
+}
+
+async function deleteFile(dir: FileSystemDirectoryHandle, filename: string) {
+  try {
+    await dir.removeEntry(filename);
+  } catch {
+    /* ignora se non esiste */
+  }
+}
+
+async function listFiles(dir: FileSystemDirectoryHandle): Promise<string[]> {
+  const files: string[] = [];
+  for await (const [name] of dir.entries()) {
+    if (!name.startsWith(".")) files.push(name);
+  }
+  return files;
+}
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -89,5 +136,48 @@ export function useFileSystem() {
     }
   }
 
-  return { status, rootHandle, requestAccess, reauthorize };
+  async function saveEntity<T extends { id: string }>(
+    type: string,
+    entity: T,
+  ): Promise<T> {
+    if (!rootHandle) throw new Error("Nessun accesso alla cartella");
+    const dir = await getOrCreateSubdir(rootHandle, type);
+    await writeFile(dir, `${entity.id}.json`, JSON.stringify(entity, null, 2));
+    return entity;
+  }
+
+  async function loadEntities<T>(type: string): Promise<T[]> {
+    if (!rootHandle) return [];
+    const dir = await getOrCreateSubdir(rootHandle, type);
+    const files = await listFiles(dir);
+    const entities: T[] = [];
+    for (const file of files) {
+      if (!file.endsWith(".json")) continue;
+      const raw = await readFile(dir, file);
+      if (raw) {
+        try {
+          entities.push(JSON.parse(raw));
+        } catch {
+          /* salta file corrotti */
+        }
+      }
+    }
+    return entities.sort((a: any, b: any) => b.updatedAt - a.updatedAt);
+  }
+
+  async function deleteEntity(type: string, id: string) {
+    if (!rootHandle) return;
+    const dir = await getOrCreateSubdir(rootHandle, type);
+    await deleteFile(dir, `${id}.json`);
+  }
+
+  return {
+    status,
+    rootHandle,
+    requestAccess,
+    reauthorize,
+    saveEntity,
+    loadEntities,
+    deleteEntity,
+  };
 }
